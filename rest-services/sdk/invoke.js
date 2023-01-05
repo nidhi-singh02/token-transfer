@@ -34,23 +34,22 @@ var invoke = async function (channelID, chaincode, contractName, functionName, f
         // Get the contract from the network.
         const contract = network.getContract(chaincode, contractName);
 
+      //  const transactionID = contract.createTransaction().getTransactionId();
+     
+
         // Submit the specified transaction.
         let response;
         if (functionName == "TransferToken") {
-            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.amount);
+            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.amount,"SBI");
 
-        } else if (functionName == "TransferTicket") {
-            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.ticketID);
-
-        }
-        else if (functionName == "ApproveTicket") {
+        } else if (functionName == "ApproveToken") {
             response = await contract.submitTransaction(functionName, functionArgs.from, functionArgs.to, functionArgs.ticketID);
 
-        } else if (functionName == "TransferTicketFrom") {
+        } else if (functionName == "TransferTokenFrom") {
             response = await contract.submitTransaction(functionName, functionArgs.from, functionArgs.to, functionArgs.ticketID, functionArgs.price);
 
-        } else if (functionName == "MintTicket") {
-            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.festivalID, functionArgs.ticketID);
+        } else if (functionName == "MintToken") {
+            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.amount, "123abdfyguigiuy",channelID,functionArgs.cts);
 
         }
         else {

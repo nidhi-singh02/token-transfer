@@ -2,10 +2,9 @@
 
 const FabricConfig = {
     channelID: 'festtickets',
-    chaincodeID: 'marketplace',
-    nftContract: 'NFTContract',
+    chaincodeID: 'token',
     ftContract: 'FTContract',
-    ticketFestContract: 'TicketFest'
+    tokenFestContract: 'TokenFest'
 };
 const Config = {
     port: 9085

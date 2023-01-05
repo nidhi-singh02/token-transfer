@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"log"
 	"strconv"
 )
@@ -24,21 +25,21 @@ const totalSupplyKey = "supplykey"
 const allowancePrefix = "allowance"
 
 // This function triggers a Transfer event
-//Mint of Token can be done only by Exchange Operator
-func (f *FTContract) MintToken(ctx contractapi.TransactionContextInterface, amount int) error {
+//Mint of Token can be done only by Admin
+func (f *FTContract) MintToken(ctx contractapi.TransactionContextInterface, account string, amount int, txnID string,channel string,cts string) error {
 
 	if amount <= 0 {
 		return fmt.Errorf("mint amount must be a positive integer")
 	}
 
 	// TODO: Extract identity information of the transactor. Minting is
-	// allowed only to the exchange operators.
+	// allowed only to the admins.
 	// Assuming a dummy operator account for the demo purpose in this example.
 	// Instead of reading the identity of the transactor and checking if the
 	// identity has minting permission in it.
-	fromBytes, err := ctx.GetStub().GetState(ExchangeOperator)
+	fromBytes, err := ctx.GetStub().GetState(account)
 	if err != nil {
-		return fmt.Errorf("failed to read client account %s from world state: %v", ExchangeOperator, err)
+		return fmt.Errorf("failed to read client account %s from world state: %v", account, err)
 	}
 
 	var UserData User
@@ -49,38 +50,37 @@ func (f *FTContract) MintToken(ctx contractapi.TransactionContextInterface, amou
 
 	//check user has Any roles assigned to it
 	if len(UserData.Role) <= 0 {
-		return fmt.Errorf("user %v has NO role", ExchangeOperator)
+		return fmt.Errorf("user %v has NO role", account)
 
 	}
 	roles := UserData.Role
 
 	UserHasOrgRole := false
-	//Check user role is of Exchange Operator for minting Tokens
+	//Check user role is of Admin for minting Tokens
 	for _, role := range roles {
-		if role == "exchangeOperator" {
+		if role == "admin" {
 			UserHasOrgRole = true
 			break
 		}
 	}
-	//Only ExchangeOperator is authorized to Mint Tickets
+	//Only Admin is authorized to Mint Tickets
 	if !UserHasOrgRole {
-		return fmt.Errorf("User %v Not authorized to mint Tokens", ExchangeOperator)
+		return fmt.Errorf("User %v Not authorized to mint Tokens", account)
 
 	}
 
 	var currentBalance, updatedBalance float32
 
-	currentBalance = UserData.Token
-	updatedBalance = currentBalance + float32(amount)
-
-	UserData.Token = updatedBalance
+    currentBalance = UserData.Balance
+    updatedBalance = currentBalance + float32(amount)
+	UserData.Balance = updatedBalance
 
 	userJSON, err := json.Marshal(UserData)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(ExchangeOperator, userJSON)
+	err = ctx.GetStub().PutState(account, userJSON)
 	if err != nil {
 		return fmt.Errorf("failed to put to world state for user %v", err)
 	}
@@ -107,8 +107,25 @@ func (f *FTContract) MintToken(ctx contractapi.TransactionContextInterface, amou
 		return err
 	}
 
+	ID := account + cts;
+
+	//TxnID:= shim.GetTxID();
+  //	log.Printf("TxnID %s",TxnID)
+	WrapperData :=  Wrapper{UserID : account, Status : "active", Source: channel, ID : ID,OriginTxnID: txnID, Token : Token{Name : "Digital Rupee", Symbol : "INR", Value : amount,UserID : account }  }
+	
+
+	wrapperJSON, err := json.Marshal(WrapperData)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(ID, wrapperJSON)
+	if err != nil {
+		return fmt.Errorf("failed to put to world state for user %v", err)
+	}
+
 	// Emit the Transfer event
-	transferEvent := eventToken{"0x0", ExchangeOperator, amount}
+	transferEvent := eventToken{"0x0", account, amount}
 	transferEventJSON, err := json.Marshal(transferEvent)
 	if err != nil {
 		return fmt.Errorf("failed to obtain JSON encoding: %v", err)
@@ -118,13 +135,13 @@ func (f *FTContract) MintToken(ctx contractapi.TransactionContextInterface, amou
 		return fmt.Errorf("failed to set event: %v", err)
 	}
 
-	log.Printf("minter account %s balance updated from %v to %v", ExchangeOperator, currentBalance, updatedBalance)
+	log.Printf("minter account %s balance updated from %v to %v - %v", account, currentBalance, updatedBalance,WrapperData)
 
 	return nil
 
 }
 
-func (f *FTContract) TransferToken(ctx contractapi.TransactionContextInterface, to string, amount int) error {
+func (f *FTContract) TransferToken(ctx contractapi.TransactionContextInterface, to string, amount int,channel string) error {
 	if amount < 0 { // transfer of 0 is allowed in ERC-20, so just validate against negative amounts
 		return fmt.Errorf("amount must be a positive integer")
 	}
@@ -134,14 +151,14 @@ func (f *FTContract) TransferToken(ctx contractapi.TransactionContextInterface, 
 	// Assuming a dummy operator account for the demo purpose in this example.
 	// Instead of reading the identity of the transactor and checking if the
 	// identity has minting permission in it.
-	fromBytes, err := ctx.GetStub().GetState(ExchangeOperator)
+	fromBytes, err := ctx.GetStub().GetState(AdminID)
 	if err != nil {
-		return fmt.Errorf("failed to read ExchangeOperator %s from world state: %v", ExchangeOperator, err)
+		return fmt.Errorf("failed to read admin %s from world state: %v", AdminID, err)
 	}
 
-	//check ExchangeOperator account exists or not
+	//check admin account exists or not
 	if fromBytes == nil {
-		return fmt.Errorf("ExchangeOperator account %s is invalid. It does not exists", ExchangeOperator)
+		return fmt.Errorf("admin account %s is invalid. It does not exists", AdminID)
 
 	}
 
@@ -164,19 +181,19 @@ func (f *FTContract) TransferToken(ctx contractapi.TransactionContextInterface, 
 
 	var currentBalance, updatedBalance float32
 
-	currentBalance = FromUserData.Token
+	currentBalance = FromUserData.Balance
 
 	if currentBalance == 0 {
-		return fmt.Errorf("ExchangeOperator account %s has no balance", ExchangeOperator)
+		return fmt.Errorf("admin account %s has no balance", AdminID)
 	}
 
 	if currentBalance < float32(amount) {
-		return fmt.Errorf("ExchangeOperator account %s has insufficient funds", ExchangeOperator)
+		return fmt.Errorf("admin account %s has insufficient funds", AdminID)
 	}
 
 	updatedBalance = currentBalance - float32(amount)
 
-	FromUserData.Token = updatedBalance
+	FromUserData.Balance = updatedBalance
 	userJSON, err := json.Marshal(FromUserData)
 	if err != nil {
 		return err
@@ -188,18 +205,18 @@ func (f *FTContract) TransferToken(ctx contractapi.TransactionContextInterface, 
 		err = json.Unmarshal(toBytes, &ToUserData)
 	}
 
-	toCurrentBalance := ToUserData.Token
+	toCurrentBalance := ToUserData.Balance
 	toUpdatedBalance := toCurrentBalance + float32(amount)
-	ToUserData.Token = toUpdatedBalance
+	ToUserData.Balance = toUpdatedBalance
 
 	touserJSON, err := json.Marshal(ToUserData)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(ExchangeOperator, userJSON)
+	err = ctx.GetStub().PutState(AdminID, userJSON)
 	if err != nil {
-		return fmt.Errorf("failed to put to world state for ExchangeOperator user %v", err)
+		return fmt.Errorf("failed to put to world state for admin user %v", err)
 	}
 
 	err = ctx.GetStub().PutState(to, touserJSON)
@@ -207,11 +224,44 @@ func (f *FTContract) TransferToken(ctx contractapi.TransactionContextInterface, 
 		return fmt.Errorf("failed to put to world state for to user %v", err)
 	}
 
-	log.Printf("ExchangeOperator %s balance updated from %v to %v", ExchangeOperator, currentBalance, updatedBalance)
+	log.Printf("admin %s balance updated from %v to %v", AdminID, currentBalance, updatedBalance)
 	log.Printf("recipient %s balance updated from %v to %v", to, toCurrentBalance, toUpdatedBalance)
 
+	// Wrapper
+	AdminBytes, err := ctx.GetStub().GetState(AdminID)
+	if err != nil {
+		return fmt.Errorf("failed to read recipient account %s from world state: %v", to, err)
+	}
+
+	//check to account exists or not
+	if AdminBytes == nil {
+		return fmt.Errorf("to account %s is invalid. It does not exists", to)
+
+	}
+
+	var WrapperData Wrapper
+
+	if AdminBytes != nil {
+		err = json.Unmarshal(AdminBytes, &WrapperData)
+	}
+
+	WrapperData.Status = "inactive"
+	WrapperData.UserID = to
+	WrapperData.Destination = channel
+	WrapperData.Token.UserID = to
+
+	wrapperJSON, err := json.Marshal(WrapperData)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(to, wrapperJSON)
+	if err != nil {
+		return fmt.Errorf("failed to put to world state for to user %v", err)
+	}
+
 	// Emit the Transfer event
-	transferEvent := eventToken{ExchangeOperator, to, amount}
+	transferEvent := eventToken{AdminID, to, amount}
 	transferEventJSON, err := json.Marshal(transferEvent)
 	if err != nil {
 		return fmt.Errorf("failed to obtain JSON encoding: %v", err)
@@ -257,20 +307,20 @@ func TransferTokenFrom(ctx contractapi.TransactionContextInterface, from string,
 		err = json.Unmarshal(fromBytes, &FromUserData)
 	}
 
-	amountFloat := float32(amount)
-	currentBalance := FromUserData.Token
+//	amountFloat := float32(amount)
+	//currentBalance := FromUserData.Token
 
-	if currentBalance == 0 {
-		return fmt.Errorf("from account %s has no balance", from)
-	}
+	// if currentBalance == 0 {
+	// 	return fmt.Errorf("from account %s has no balance", from)
+	// }
 
-	if currentBalance < amountFloat {
-		return fmt.Errorf("from account %s has insufficient funds", from)
-	}
+	// if currentBalance < amountFloat {
+	// 	return fmt.Errorf("from account %s has insufficient funds", from)
+	// }
 
-	updatedBalance := currentBalance - amountFloat
+	// updatedBalance := currentBalance - amountFloat
 
-	FromUserData.Token = updatedBalance
+//	FromUserData.Token = updatedBalance
 	userJSON, err := json.Marshal(FromUserData)
 	if err != nil {
 		return err
@@ -282,10 +332,25 @@ func TransferTokenFrom(ctx contractapi.TransactionContextInterface, from string,
 		err = json.Unmarshal(toBytes, &ToUserData)
 	}
 
-	toCurrentBalance := ToUserData.Token
-	toUpdatedBalance := toCurrentBalance + amountFloat
-	ToUserData.Token = toUpdatedBalance
+//	toCurrentBalance := ToUserData.Token
+//	toUpdatedBalance := toCurrentBalance + amountFloat
+//	ToUserData.Token = toUpdatedBalance
 
+
+	// get token
+	TokenBytes, err := ctx.GetStub().GetState(from)
+	if err != nil {
+		return fmt.Errorf("failed to read recipient account %s from world state: %v", to, err)
+	}
+
+	if TokenBytes == nil {
+		return fmt.Errorf("to account %s is invalid. It does not exists", to)
+
+	}
+
+
+	//
+	
 	touserJSON, err := json.Marshal(ToUserData)
 	if err != nil {
 		return err
@@ -301,8 +366,8 @@ func TransferTokenFrom(ctx contractapi.TransactionContextInterface, from string,
 		return fmt.Errorf("failed to put to world state for to user %v", err)
 	}
 
-	log.Printf("Token : from %s balance updated from %v to %v", from, currentBalance, updatedBalance)
-	log.Printf("Token : recipient %s balance updated from %v to %v", to, toCurrentBalance, toUpdatedBalance)
+	// log.Printf("Token : from %s balance updated from %v to %v", from, currentBalance, updatedBalance)
+	// log.Printf("Token : recipient %s balance updated from %v to %v", to, toCurrentBalance, toUpdatedBalance)
 
 	// Emit the Transfer event
 	transferEvent := eventToken{from, to, int(amount)}
@@ -336,9 +401,9 @@ func (f *FTContract) BalanceOfToken(ctx contractapi.TransactionContextInterface,
 		err = json.Unmarshal(UserBytes, &UserData)
 	}
 
-	balance := UserData.Token // Error handling not needed since Itoa() was used when setting the account balance, guaranteeing it was an integer.
+//	balance := UserData.Token // Error handling not needed since Itoa() was used when setting the account balance, guaranteeing it was an integer.
 
-	return balance, nil
+	return 1, nil
 }
 
 // TotalSupply returns the total token supply
@@ -368,9 +433,9 @@ func (f *FTContract) TotalSupplyToken(ctx contractapi.TransactionContextInterfac
 // The spender can withdraw multiple times if necessary, up to the value amount. This function triggers an Approval event
 func (f *FTContract) ApproveToken(ctx contractapi.TransactionContextInterface, spender string, value int) error {
 
-	fromBytes, err := ctx.GetStub().GetState(ExchangeOperator)
+	fromBytes, err := ctx.GetStub().GetState(AdminID)
 	if err != nil {
-		return fmt.Errorf("failed to read client account %s from world state: %v", ExchangeOperator, err)
+		return fmt.Errorf("failed to read client account %s from world state: %v", AdminID, err)
 	}
 
 	var UserData User
@@ -437,4 +502,45 @@ func (f *FTContract) AllowanceToken(ctx contractapi.TransactionContextInterface,
 	log.Printf("The allowance left for spender %s to withdraw from owner %s: %d", spender, owner, allowance)
 
 	return allowance, nil
+}
+
+
+
+// QueryTickets uses a query string to perform a query for assets.
+// Query string matching state database syntax is passed in and executed as is.
+// Supports ad hoc queries that can be defined at runtime by the client.
+// Only available on state databases that support rich query (e.g. CouchDB)
+func (f *FTContract) QueryTokens(ctx contractapi.TransactionContextInterface, queryString string) ([]*Wrapper, error) {
+	return getQueryResultForQueryString(ctx, queryString)
+}
+
+// getQueryResultForQueryString executes the passed in query string.
+// The result set is built and returned as a byte array containing the JSON results.
+func getQueryResultForQueryString(ctx contractapi.TransactionContextInterface, queryString string) ([]*Wrapper, error) {
+	resultsIterator, err := ctx.GetStub().GetQueryResult(queryString)
+	if err != nil {
+		return nil, err
+	}
+	defer resultsIterator.Close()
+
+	return constructQueryResponseFromIterator(resultsIterator)
+}
+
+// constructQueryResponseFromIterator constructs a slice of assets from the resultsIterator
+func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorInterface) ([]*Wrapper, error) {
+	var wrapperToken []*Wrapper
+	for resultsIterator.HasNext() {
+		queryResult, err := resultsIterator.Next()
+		if err != nil {
+			return nil, err
+		}
+		var wrapper Wrapper
+		err = json.Unmarshal(queryResult.Value, &wrapper)
+		if err != nil {
+			return nil, err
+		}
+		wrapperToken = append(wrapperToken, &wrapper)
+	}
+
+	return wrapperToken, nil
 }

@@ -31,7 +31,7 @@ peer chaincode invoke $TARGET_TLS_OPTIONS -C  $CHANNEL_NAME  -n $CHAINCODE_NAME 
 
 peer chaincode invoke $TARGET_TLS_OPTIONS -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"function":"RegisterUser","Args":["nidhi@hdfc","hdfcbank404"]}'
 
-peer chaincode invoke $TARGET_TLS_OPTIONS -C $CHANNEL_NAME  -n $CHAINCODE_NAME -c '{"function":"FTContract:MintToken","Args":["200"]}'
+peer chaincode invoke $TARGET_TLS_OPTIONS -C $CHANNEL_NAME  -n $CHAINCODE_NAME -c '{"function":"FTContract:MintToken","Args":["admin@hdfcbank","200"]}'
 
 peer chaincode invoke $TARGET_TLS_OPTIONS -C  $CHANNEL_NAME  -n $CHAINCODE_NAME -c '{"function":"FTContract:TransferToken","Args":["user101","2"]}'
 
