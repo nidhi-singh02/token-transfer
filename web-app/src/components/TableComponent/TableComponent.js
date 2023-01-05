@@ -182,7 +182,9 @@ function TableForm(props) {
         CallBuyToken();
         setState(prevState => ({
             ...prevState,
-            amount: ''
+            amount: '',
+             receiver:''
+
         }))
 
     }
