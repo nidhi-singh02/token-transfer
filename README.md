@@ -37,6 +37,4 @@ This folder is participant's interface(User,Admin) developed using react.js. Thi
 - **Front end starts on port 3001 (localhost:3001).**
 - **Front end : http://localhost:3001**
 
-# Demo video
 
-[![Watch the video](https://github.com/nidhi-singh02/NFT-FT-festival/blob/main/demo-icon.PNG)]()
