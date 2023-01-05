@@ -1,4 +1,4 @@
-## SettleMint Assigment
+## Token Transfer
 
 We have three folders for three different layers
 
@@ -40,4 +40,4 @@ This folder is participant's interface(User,Organizer,Secondary Market Admin) de
 
 # Demo video
 
-[![Watch the video](https://github.com/nidhi-singh02/NFT-FT-festival/blob/main/demo-icon.PNG)](https://drive.google.com/file/d/1HteGqocJR5vCWuuHg8fQLYIAMPuiuB92/view?usp=sharing)
+[![Watch the video](https://github.com/nidhi-singh02/NFT-FT-festival/blob/main/demo-icon.PNG)]()
