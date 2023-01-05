@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="asset-transfer-basic" target="11" />
+      <module name="asset-transfer-basic.main" target="11" />
+      <module name="asset-transfer-basic.test" target="11" />
+      <module name="asset-transfer-events" target="11" />
+      <module name="asset-transfer-events-java" target="11" />
+      <module name="asset-transfer-events-java.main" target="11" />
+      <module name="asset-transfer-events-java.test" target="11" />
+      <module name="asset-transfer-events.main" target="11" />
+      <module name="asset-transfer-events.test" target="11" />
+      <module name="events" target="11" />
+      <module name="events.main" target="11" />
+      <module name="events.test" target="11" />
+      <module name="off-chain-data.app" target="11" />
+      <module name="off-chain-data.app.main" target="11" />
+      <module name="off-chain-data.app.test" target="11" />
+      <module name="token_erc20" target="11" />
+      <module name="token_erc20.main" target="11" />
+      <module name="token_erc20.test" target="11" />
+      <module name="token_erc721" target="11" />
+      <module name="token_erc721.main" target="11" />
+      <module name="token_erc721.test" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
