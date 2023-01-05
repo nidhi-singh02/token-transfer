@@ -31,7 +31,7 @@ function LoginForm(props) {
             props.showError(null)
         } else {
             console.log("API_BASE_URL",API_BASE_URL)
-            axios.post('http://10.28.20.64:9085' + '/user', payload)
+            axios.post(API_BASE_URL + '/user', payload)
                 .then(function (response) {
                     if (response.status === 200) {
                         setState(prevState => ({
