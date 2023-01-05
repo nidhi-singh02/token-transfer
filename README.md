@@ -16,7 +16,7 @@ Bridge between an user interface layer and fabric network layer.
 
 ### web-app
 
-This folder is participant's interface(User,Organizer,Secondary Market Admin) developed using react.js. This consumes REST API to contact with Web server.
+This folder is participant's interface(User,Admin) developed using react.js. This consumes REST API to contact with Web server.
 
 # Prerequisites:
 
@@ -35,8 +35,7 @@ This folder is participant's interface(User,Organizer,Secondary Market Admin) de
 - **Rest service starts on port 9085 (localhost:9085). Check by hitting "http://localhost:9085/ping" in browser**
 - **For verifying REST services, please find the Postman collection named "Ticket Festival"**
 - **Front end starts on port 3001 (localhost:3001).**
-- **SettleMint front end : http://localhost:3001**
-- **Secondary Market front end : http://localhost:3001/secondaryMarket**
+- **Front end : http://localhost:3001**
 
 # Demo video
 
