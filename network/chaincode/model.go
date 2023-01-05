@@ -1,45 +1,39 @@
 package main
 
-// Bank describes basic details of Bank
-type Bank struct {
-	BankID     string   `json:"ID"`
+// Festival describes basic details of Festival
+type Festival struct {
+	FestivalID     string   `json:"ID"`
 	Name           string   `json:"name"`
-	MaxNoOfToken int      `json:"maxNoOfToken"`
-	TotalToken   int      `json:"totalToken"`
-	Admins []string `json:"admins"`
+	MaxNoOfTickets int      `json:"maxNoOfTickets"`
+	TotalTickets   int      `json:"totalTickets"`
+	TicketsSold    int      `json:"ticketsSold"`
+	TicketsLeft    int      `json:"ticketsLeft"`
+	Organizers     []string `json:"organizers"`
 }
 
 type User struct {
 	UserID   string   `json:"userID"`
 	UserName string   `json:"userName"`
 	Role     []string `json:"role"`
-//	Token    []Token  `json:"token"`
-	balance    int  `json:"balance"`
-	BankID     []string `json:"bankID"`
+	Token    float32  `json:"token"`
 }
 
-
-type Wrapper struct {
-	Status     string `json:"status"`
-	TransactionID     string `json:"transactionID"`
-	Source     string `json:"source"`
-	Destination     string `json:"destination"`
-	UserID  string `json:"userID"`
-	Token Token `json:"token"`
-	Id - owner+cts
+type Ticket struct {
+	TicketID   string  `json:"ticketID"`
+	FestivalID string  `json:"festivalID"`
+	Price      float32 `json:"price"`
+	Owner      string  `json:"owner"`
+	Approved   string  `json:"approved"`
+	Organizer  string `json:"organizer"`
 }
 
-type Token struct {
-	Name string `json:"name"`
-	Symbol string  `json:"symbol"`
-	Value   float32 `json:"value"`
-	UserID string  `json:"UserID"`
-}
+var Roles = []string{"organizer", "user", "exchangeOperator", "secondaryMarketplace"}
 
 //Role constants
-var Roles = []string{"admin", "user"}
 
-const BankID = "hdfcbank404"
-const AdminID = "admin@hdfcbank"
-const AdminBalance = 1000000
-const Maxtoken= 700000000
+const FestivalID = "fest404"
+const OrganizerID = "wbp@wbp.org"
+const ExchangeOperator = "exchange@wbp.org"
+const SecondaryMarketAdmin = "secondary@wbp.org"
+
+var fixedTicketPrice float32 = 1000

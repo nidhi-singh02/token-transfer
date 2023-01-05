@@ -10,7 +10,7 @@ echo "couchDB is running on port 7984 and 8984"
 sleep 1
 echo "*******************************************************************"
 echo "Deploying chaincode 'festival' on channel 'festtickets'"
-./network.sh deployCC -ccn marketplace -ccp ../chaincode/ -ccl go -c festtickets -ccv 1.0 -ccs 1 -cci initLedger
+./network.sh deployCC -ccn token -ccp ../chaincode/ -ccl go -c festtickets -ccv 1.0 -ccs 1 -cci initLedger
 echo "Chaincode deployment- completed"
 echo "*******************************************************************"
 sleep 2

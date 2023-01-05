@@ -8,64 +8,99 @@ import (
 	"strconv"
 )
 
-// TokenFest provides functions for transferring tokens between accounts
-type TokenFest struct {
+// TicketFest provides functions for  transferring tokens between accounts
+type TicketFest struct {
 	contractapi.Contract
 }
 
 func main() {
 
-	TokenFestChaincode, err := contractapi.NewChaincode(&TokenFest{}, &FTContract{})
+	TicketFestChaincode, err := contractapi.NewChaincode(&TicketFest{}, &NFTContract{}, &FTContract{})
 	if err != nil {
-		log.Panicf("Error creating TokenFest chaincode: %v", err)
+		log.Panicf("Error creating TicketFest chaincode: %v", err)
 	}
 
-	fmt.Println("TokenFestChaincode:", TokenFestChaincode)
-	if err := TokenFestChaincode.Start(); err != nil {
-		log.Panicf("Error starting TokenFestChaincode : %v", err)
+	fmt.Println("TicketFestChaincode:", TicketFestChaincode)
+	if err := TicketFestChaincode.Start(); err != nil {
+		log.Panicf("Error starting TicketFest chaincode: %v", err)
 	}
 
 }
 
 // InitLedger adds a base set of assets to the ledger
-func (t *TokenFest) InitLedger(ctx contractapi.TransactionContextInterface) error {
+func (t *TicketFest) InitLedger(ctx contractapi.TransactionContextInterface) error {
 
 	//Initiliaze Organizer for SettlemintFest
 
-	admin := User{UserID: AdminID, UserName: "Admin", Role: []string{"admin"}, Balance: AdminBalance, BankID : bankID }
+	organizer := User{UserID: OrganizerID, UserName: "WBP", Role: []string{"organizer"}}
 
-	adminJSON, err := json.Marshal(admin)
+	organizerJSON, err := json.Marshal(organizer)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(AdminID, adminJSON)
+	err = ctx.GetStub().PutState(OrganizerID, organizerJSON)
 	if err != nil {
-		return fmt.Errorf("failed to put to world state for admin %v", err)
+		return fmt.Errorf("failed to put to world state for organizer %v", err)
 	}
 
-	//Initiliaze bank
-	bank := Bank{BankID: bankID, Name: "HDFC bank", MaxNoOfToken: Maxtoken, Admins: []string{AdminID}, TotalToken: AdminBalance}
+	//Initiliaze festival
+	festival := Festival{FestivalID: FestivalID, Name: "TGIF-Fest", MaxNoOfTickets: 100, Organizers: []string{OrganizerID}}
 
-	bankJSON, err := json.Marshal(bank)
+	festivalJSON, err := json.Marshal(festival)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(bank.bankID, bankJSON)
+	err = ctx.GetStub().PutState(festival.FestivalID, festivalJSON)
 	if err != nil {
-		return fmt.Errorf("failed to put to world state for bank %v", err)
+		return fmt.Errorf("failed to put to world state for festival %v", err)
+	}
+
+	//Initiliaze Exchange Agency admin 
+	exchangeAdmin := User{UserID: ExchangeOperator, UserName: "ExchangeOperator", Role: []string{"exchangeOperator"}, Token: 0}
+
+	exchangeAdminJSON, err := json.Marshal(exchangeAdmin)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(ExchangeOperator, exchangeAdminJSON)
+	if err != nil {
+		return fmt.Errorf("failed to put to world state for ExchangeOperator %v", err)
+	}
+
+	//Initiliaze Secondary Market Admin
+	
+	secondaryMarketAdmin := User{UserID: SecondaryMarketAdmin, UserName: "SecondaryMarketAdmin", Role: []string{"secondaryMarketplace"}}
+
+	secondaryAdminJSON, err := json.Marshal(secondaryMarketAdmin)
+	if err != nil {
+		return err
+	}
+
+	err = ctx.GetStub().PutState(SecondaryMarketAdmin, secondaryAdminJSON)
+	if err != nil {
+		return fmt.Errorf("failed to put to world state for SecondaryMarketAdmin %v", err)
 	}
 
 	FTContract  := FTContract{}
 	ptrFTContract := &FTContract
 	// Mint 2000 tokens by Exchange Admin
-	(*ptrFTContract).MintToken(ctx,20000)
+	(*ptrFTContract).MintToken(ctx,2000)
+
+	NFTContract  := NFTContract{}
+	ptrNFTContract := &NFTContract
+	
+	//Mint 10 tickets for festival at initilization time by Organizer
+	for i:= 0;i<10;i++{
+	(*ptrNFTContract).MintTicket(ctx , OrganizerID , FestivalID , "tic"+ strconv.Itoa(i))
+	}
 
 	return nil
 }
 
-func (t *TokenFest) RegisterUser(ctx contractapi.TransactionContextInterface, userID string, bankID string) error {
+func (t *TicketFest) RegisterUser(ctx contractapi.TransactionContextInterface, userID string) error {
 
 	//Verify userID is already registered
 	UserBytes, err := ctx.GetStub().GetState(userID)
@@ -78,7 +113,7 @@ func (t *TokenFest) RegisterUser(ctx contractapi.TransactionContextInterface, us
 
 	}
 
-	user := User{UserID: userID, UserName: userID, Role: []string{"user"}, BankID: bankID}
+	user := User{UserID: userID, UserName: userID, Role: []string{"user"}}
 
 	userJSON, err := json.Marshal(user)
 	if err != nil {
@@ -94,26 +129,26 @@ func (t *TokenFest) RegisterUser(ctx contractapi.TransactionContextInterface, us
 
 }
 
-func (t *TokenFest) QuerybankByID(ctx contractapi.TransactionContextInterface, bankID string) (bank,error) {
-	//Check bankID exists or not
+func (t *TicketFest) QueryFestivalByID(ctx contractapi.TransactionContextInterface, FestivalID string) (Festival,error) {
+	//Check festivalID exists or not
 
-	bankBytes, err := ctx.GetStub().GetState(bankID)
+	FestivalBytes, err := ctx.GetStub().GetState(FestivalID)
 	if err != nil {
-		return bank{},fmt.Errorf("failed to read bankID %s : %v", bankID, err)
+		return Festival{},fmt.Errorf("failed to read festivalID %s : %v", FestivalID, err)
 	}
 
-	var bankData bank
+	var FestivalData Festival
 
-	if bankBytes == nil {
-		return bank{},fmt.Errorf("bankID %s is invalid.It does not exist", bankID)
+	if FestivalBytes == nil {
+		return Festival{},fmt.Errorf("FestivalID %s is invalid.It does not exist", FestivalID)
 
 	}
 
-	if bankBytes != nil {
-		err = json.Unmarshal(bankBytes, &bankData)
+	if FestivalBytes != nil {
+		err = json.Unmarshal(FestivalBytes, &FestivalData)
 	}
 
-	return bankData,nil
+	return FestivalData,nil
 
 
 }
