@@ -11,7 +11,7 @@ function Header(props) {
         title = 'Welcome to NetBanking Portal'
     }
     function renderLogout() {
-        if (props.location.pathname === '/home') {
+        if (props.location.pathname === '/table' || props.location.pathname === '/organizer') {
             return (
                 <div className="ml-auto">
                     <button className="btn btn-danger" onClick={() => handleLogout()}>Logout</button>
@@ -27,6 +27,7 @@ function Header(props) {
         <nav className="navbar navbar-dark bg-primary">
             <div className="row col-12 d-flex justify-content-left text-white">
                 <span className="h3">{props.title || title}</span>
+
 
                 {renderLogout()}
             </div>
