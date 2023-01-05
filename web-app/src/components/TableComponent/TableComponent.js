@@ -10,7 +10,7 @@ function TableForm(props) {
     const [state, setState] = useState({
         email: "",
         password: "",
-        tickets_zero: [{ "Ticket ID": "", "Festival ID": "", "Owner": "", "Price": "", "Approved": "" }],
+        tickets_zero: [{  "Price": "", "Approved": "" }],
         successMessage: "",
         balance: 0,
         tickets: []
@@ -99,7 +99,7 @@ function TableForm(props) {
     const CallBuyToken = () => {
 
         props.showError(null);
-        const payload = { "userID": props.emailID, "amount": state.amount }
+        const payload = { "userID": props.emailID, "amount": state.amount,"receiver":state.receiver }
 
         axios.post(API_BASE_URL + '/getToken/', payload)
             .then(function (response) {
@@ -225,6 +225,9 @@ function TableForm(props) {
                         <label for="amount">Enter amount:</label>
                         <input type="number" step="0.01" class="form-control" id="amount" value={state.amount}
                             onChange={handleChange} />
+                        <label for="receiver">Enter Receiver Id:</label>
+                        <input type="text"  class="form-control" id="receiver" value={state.receiver}
+                            onChange={handleChange} />
                     </div>
                 </form>
 
@@ -234,7 +237,7 @@ function TableForm(props) {
                     className="btn btn-primary"
                     onClick={handleSubmitClickToken}
                 >
-                    Buy Token
+                    Transfer
                 </button>
             </div >
 
