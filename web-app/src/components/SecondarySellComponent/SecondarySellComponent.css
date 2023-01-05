@@ -1,0 +1,43 @@
+#title {
+  text-align: center;
+  font-family: arial, sans-serif;
+}
+
+#tickets {
+  text-align: center;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  border: 3px solid #ddd;
+  width: 100%;
+}
+
+#tickets td,
+#tickets th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#tickets tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#tickets tr:hover {
+  background-color: #ddd;
+}
+
+#tickets th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn {
+  margin: 20px 20px 20px 20px;
+}
+
+.form-group-token {
+  margin: auto;
+  border: 3px solid green;
+}

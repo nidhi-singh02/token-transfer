@@ -1,0 +1,19 @@
+version: "3.6"
+
+networks:
+  festival_test:
+    external: true
+
+services:
+  client:
+    build: .
+    container_name: festival-restapi
+    networks:
+      - festival_test
+    ports:
+      - 9085:9085
+    volumes:
+      - ./wallet/:/project/rest/wallet/
+      - ./:/project/rest/
+      - ../network/fabric-network/organizations/peerOrganizations/org1.example.com/connection-org1.json:/project/rest/connection-org1.json
+    command: bash -c "node enrollAdmin.js  && node registerUser.js && node app.js"

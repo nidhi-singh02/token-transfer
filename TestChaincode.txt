@@ -1,0 +1,66 @@
+cd token/network/fabric-network
+./network.sh up createChannel -c tickets -ca  -s couchdb
+
+Deploy the smart contract to the channel
+------------------------------------------
+./network.sh deployCC -ccn festival -ccp ../chaincode/ -ccl go -c tickets -ccv 1.2 -ccs 2
+
+Network
+----------------------
+
+cd token/network/fabric-network
+
+export PATH=${PWD}/../bin:${PWD}:$PATH
+export FABRIC_CFG_PATH=$PWD/../config/
+export CHAINCODE_NAME=marketplace
+
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID="Org1MSP"
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+export CORE_PEER_ADDRESS=localhost:7051
+export TARGET_TLS_OPTIONS="-o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem --peerAddresses localhost:7051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt"
+
+
+peer chaincode invoke $TARGET_TLS_OPTIONS -C festtickets -n $CHAINCODE_NAME -c '{"function":"initLedger","Args":[""]}'
+
+Mint Tickets
+---------------
+peer chaincode invoke $TARGET_TLS_OPTIONS -C festtickets -n $CHAINCODE_NAME -c '{"function":"NFTContract:MintTicket","Args":["wbp@wbp.org", "fest404","tic07"]}'
+
+peer chaincode invoke $TARGET_TLS_OPTIONS -C tickets -n $CHAINCODE_NAME -c '{"function":"RegisterUser","Args":["user100"]}'
+
+peer chaincode invoke $TARGET_TLS_OPTIONS -C tickets -n $CHAINCODE_NAME -c '{"function":"FTContract:MintToken","Args":["200"]}'
+
+peer chaincode invoke $TARGET_TLS_OPTIONS -C tickets -n $CHAINCODE_NAME -c '{"function":"FTContract:TransferToken","Args":["user101","2"]}'
+
+peer chaincode invoke $TARGET_TLS_OPTIONS -C tickets -n $CHAINCODE_NAME -c '{"function":"NFTContract:TransferTicket","Args":["user100","tic01fest101"]}'
+
+peer chaincode invoke $TARGET_TLS_OPTIONS -C tickets -n $CHAINCODE_NAME -c '{"function":"FTContract:TransferToken","Args":["Nidhi@gmail.com","1"]}'
+
+peer chaincode invoke $TARGET_TLS_OPTIONS -C tickets -n $CHAINCODE_NAME -c '{"function":"NFTContract:TransferTicketFrom","Args":["user100", "user101","tic04fest101","1.2"]}'
+
+peer chaincode invoke $TARGET_TLS_OPTIONS -C tickets -n $CHAINCODE_NAME -c '{"function":"NFTContract:ApproveTicket","Args":["user101", "user100","tic04fest101"]}'
+
+peer chaincode invoke $TARGET_TLS_OPTIONS -C tickets -n $CHAINCODE_NAME -c '{"function":"NFTContract:ApproveTicket","Args":["org101@gmail.com", "user100","tic04fest101"]}'
+
+peer chaincode query -C tickets -n $CHAINCODE_NAME -c '{"function":"NFTContract:QueryTickets","Args":["{\"selector\":{\"owner\":\"org101@gmail.com\"}}"]}'
+
+peer chaincode query -C tickets -n $CHAINCODE_NAME -c '{"function":"TicketFest:QueryFestivalByID","Args":["fest101"]}'
+
+
+
+
+
+//Handle decimals in newPrice for Ticket
+
+
+//Give commision to organizer (in form of token) in secondary market sales
+
+
+
+//sell ticket from user100 to others with new price
+
+
+//Buy tickets from others, other than organizer
+

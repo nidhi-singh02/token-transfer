@@ -1,0 +1,20 @@
+version: "3.6"
+
+networks:
+  festival_test:
+    external: true
+
+services:
+  webui:
+    build: .
+    container_name: festival-webui
+    stdin_open: true
+    tty: true
+    networks:
+      - festival_test
+    ports:
+      - 3001:3000
+    volumes:
+      - ./:/app/
+      - /app/node_modules
+    command: sh -c "npm run start"
