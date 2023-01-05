@@ -155,9 +155,6 @@ function TableForm(props) {
                 const { ticketID, festivalID, price, owner, approved } = ticket //destructuring
                 return (
                     <tr key={ticketID}>
-                        <td>{ticketID}</td>
-                        <td>{festivalID}</td>
-                        <td>{owner}</td>
                         <td>{price}</td>
                         <td>{approved}</td>
                     </tr>
