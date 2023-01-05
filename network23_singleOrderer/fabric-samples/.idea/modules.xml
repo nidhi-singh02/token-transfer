@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/asset-transfer-basic.iml" filepath="$PROJECT_DIR$/.idea/modules/asset-transfer-basic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/asset-transfer-basic.main.iml" filepath="$PROJECT_DIR$/.idea/modules/asset-transfer-basic.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/asset-transfer-basic.test.iml" filepath="$PROJECT_DIR$/.idea/modules/asset-transfer-basic.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/asset-transfer-events.iml" filepath="$PROJECT_DIR$/.idea/modules/asset-transfer-events.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/asset-transfer-events.main.iml" filepath="$PROJECT_DIR$/.idea/modules/asset-transfer-events.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/asset-transfer-events.test.iml" filepath="$PROJECT_DIR$/.idea/modules/asset-transfer-events.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/events.iml" filepath="$PROJECT_DIR$/.idea/modules/events.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/events.main.iml" filepath="$PROJECT_DIR$/.idea/modules/events.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/fabric-samples.iml" filepath="$PROJECT_DIR$/.idea/fabric-samples.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/off-chain-data.iml" filepath="$PROJECT_DIR$/.idea/modules/off-chain-data.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/off-chain-data.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/off-chain-data.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/off-chain-data.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/off-chain-data.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/off-chain-data.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/off-chain-data.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/token_erc20.iml" filepath="$PROJECT_DIR$/.idea/modules/token_erc20.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/token_erc20.main.iml" filepath="$PROJECT_DIR$/.idea/modules/token_erc20.main.iml" />
+    </modules>
+  </component>
+</project>
