@@ -8,9 +8,11 @@ var registerUser = async function (req, res, next) {
     try {
 
         var userID = req.body.emailID
+        var bankID = req.body.bankID
         console.log("userID :", userID)
+        console.log("bankID :", bankID)
 
-        let response = await invoke(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ticketFestContract, "RegisterUser", userID);
+        let response = await invoke(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ticketFestContract, "RegisterUser", {userID,bankID});
         let resp = JSON.stringify(response)
         console.log("response", response)
         if (resp.includes("Error")) {
@@ -32,12 +34,12 @@ var registerUser = async function (req, res, next) {
     }
 }
 
-var queryFestival = async function (req, res, next) {
+var queryBank= async function (req, res, next) {
     try {
 
-        let festivalID = req.params.ID
-        console.log("festivalID:", festivalID)
-        let response = await query(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ticketFestContract, "QueryFestivalByID", festivalID);
+        let bankID = req.params.ID
+        console.log("bankID:", bankID)
+        let response = await query(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ticketFestContract, "QueryBankByID", bankID);
         if (response.hasOwnProperty("Error")) {
             return res.status(500).json(response)
 
@@ -45,7 +47,7 @@ var queryFestival = async function (req, res, next) {
         res.status(200).json(response)
 
     } catch (error) {
-        console.log("Error while queryFestival:", error)
+        console.log("Error while query bank:", error)
         res.status(500).send({ "Error": error })
 
     }
@@ -54,6 +56,6 @@ var queryFestival = async function (req, res, next) {
 
 module.exports = {
     registerUser: registerUser,
-    queryFestival: queryFestival
+    queryBank: queryBank
 
 }

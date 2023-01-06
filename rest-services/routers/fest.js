@@ -3,6 +3,6 @@ const route = new express.Router()
 const festCtrl = require('../controllers/festController')
 
 route.post('/user', festCtrl.registerUser)
-route.get('/festival/:ID', festCtrl.queryFestival)
+route.get('/bank/:ID', festCtrl.queryBank)
 
 module.exports = route

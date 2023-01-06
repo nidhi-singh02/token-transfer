@@ -31,14 +31,14 @@ func (t *TokenFest) InitLedger(ctx contractapi.TransactionContextInterface) erro
 
 	//Initiliaze Admin for HDFCBank
 
-	admin := User{UserID: AdminID, UserName: "Admin", Role: []string{"admin"}, Balance: AdminBalance, BankID : BankID }
+	admin := User{UserID: AdminID, UserName: "u"+AdminID, Role: []string{"admin"}, Balance: AdminBalance, BankID: BankID}
 
 	adminJSON, err := json.Marshal(admin)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(AdminID, adminJSON)
+	err = ctx.GetStub().PutState("u"+AdminID, adminJSON)
 	if err != nil {
 		return fmt.Errorf("failed to put to world state for admin %v", err)
 	}
@@ -56,10 +56,10 @@ func (t *TokenFest) InitLedger(ctx contractapi.TransactionContextInterface) erro
 		return fmt.Errorf("failed to put to world state for bank %v", err)
 	}
 
-	FTContract  := FTContract{}
+	FTContract := FTContract{}
 	ptrFTContract := &FTContract
 	// Mint 200000 tokens by Admin
-	(*ptrFTContract).MintToken(ctx,AdminID,200000,"122435abc","festtickets","1672939568")
+	(*ptrFTContract).MintToken(ctx, AdminID, 200000, "122435abc", "festtickets")
 
 	return nil
 }
@@ -77,14 +77,14 @@ func (t *TokenFest) RegisterUser(ctx contractapi.TransactionContextInterface, us
 
 	}
 
-	user := User{UserID: userID, UserName: userID, Role: []string{"user"}, BankID: bankID}
+	user := User{UserID: userID, UserName: "u"+userID, Role: []string{"user"}, BankID: bankID}
 
 	userJSON, err := json.Marshal(user)
 	if err != nil {
 		return err
 	}
 
-	err = ctx.GetStub().PutState(userID, userJSON)
+	err = ctx.GetStub().PutState("u"+userID, userJSON)
 	if err != nil {
 		return fmt.Errorf("failed to put to world state for user %v", err)
 	}
@@ -93,18 +93,18 @@ func (t *TokenFest) RegisterUser(ctx contractapi.TransactionContextInterface, us
 
 }
 
-func (t *TokenFest) QuerybankByID(ctx contractapi.TransactionContextInterface, bankID string) (Bank,error) {
+func (t *TokenFest) QueryBankByID(ctx contractapi.TransactionContextInterface, bankID string) (Bank, error) {
 	//Check bankID exists or not
 
 	bankBytes, err := ctx.GetStub().GetState(bankID)
 	if err != nil {
-		return Bank{},fmt.Errorf("failed to read bankID %s : %v", bankID, err)
+		return Bank{}, fmt.Errorf("failed to read bankID %s : %v", bankID, err)
 	}
 
 	var bankData Bank
 
 	if bankBytes == nil {
-		return Bank{},fmt.Errorf("bankID %s is invalid.It does not exist", bankID)
+		return Bank{}, fmt.Errorf("bankID %s is invalid.It does not exist", bankID)
 
 	}
 
@@ -112,7 +112,6 @@ func (t *TokenFest) QuerybankByID(ctx contractapi.TransactionContextInterface, b
 		err = json.Unmarshal(bankBytes, &bankData)
 	}
 
-	return bankData,nil
-
+	return bankData, nil
 
 }

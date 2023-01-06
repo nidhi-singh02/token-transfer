@@ -29,6 +29,6 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-app.listen(port, () => console.log(`Festival app listening on port ${port}!`))
+app.listen(port, () => console.log(`Token transfer app listening on port ${port}!`))
 
 module.exports = app;

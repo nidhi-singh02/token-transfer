@@ -40,16 +40,19 @@ var invoke = async function (channelID, chaincode, contractName, functionName, f
         // Submit the specified transaction.
         let response;
         if (functionName == "TransferToken") {
-            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.amount,"SBI");
+            response = await contract.submitTransaction(functionName, functionArgs.receiverID, functionArgs.amount,"SBI");
 
         } else if (functionName == "ApproveToken") {
-            response = await contract.submitTransaction(functionName, functionArgs.from, functionArgs.to, functionArgs.ticketID);
+            response = await contract.submitTransaction(functionName, functionArgs.to, functionArgs.amount);
 
         } else if (functionName == "TransferTokenFrom") {
-            response = await contract.submitTransaction(functionName, functionArgs.from, functionArgs.to, functionArgs.ticketID, functionArgs.price);
+            response = await contract.submitTransaction(functionName, functionArgs.senderID, functionArgs.userID, functionArgs.amount, "SBI");
 
         } else if (functionName == "MintToken") {
-            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.amount, "123abdfyguigiuy",channelID,functionArgs.cts);
+            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.amount, "123abdfyguigiuy",channelID);
+
+        }else if (functionName == "RegisterUser") {
+            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.bankID);
 
         }
         else {
