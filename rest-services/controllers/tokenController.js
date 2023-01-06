@@ -124,7 +124,7 @@ var approveToken = async function (req, res, next) {
         var { senderID, receiverID, amount } = req.body
         console.log("senderID receiverID :", senderID,receiverID)
 
-        let response = await invoke(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ftContract, "TransferToken", { userID: receiverID, amount: amount,senderID: senderID });
+        let response = await invoke(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ftContract, "ApproveToken", { receiverID: receiverID, amount: amount,senderID: senderID });
 
         let resp = JSON.stringify(response)
         if (resp.includes("Error")) {
@@ -151,7 +151,7 @@ var tokenByOwner = async function (req, res, next) {
         if (UserID == "" || UserID == 'null') {
             return res.status(501).send("User ID cannot be null")
         }
-        let response = await query(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ftContract, "QueryTokens", '{"selector":{"userID":"' + UserID + '"}}');
+        let response = await query(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ftContract, "QueryTokens", '{"selector":{"userID":"' + UserID + '", "userName": { "$exists": false}}}}');
         if (response.hasOwnProperty("Error")) {
             return res.status(500).send(response)
 

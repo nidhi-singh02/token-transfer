@@ -34,24 +34,29 @@ var invoke = async function (channelID, chaincode, contractName, functionName, f
         // Get the contract from the network.
         const contract = network.getContract(chaincode, contractName);
 
-      //  const transactionID = contract.createTransaction().getTransactionId();
+      //  const transactionID = contract.createTransaction(functionName).getTransactionId();
     
+       const transaction = contract.createTransaction(functionName);
+       const transactionId = transaction.getTransactionId()
+       let response;
+
+       console.log("transactionId",transactionId)
+    //    response = transaction.submit(functionArgs.userID, functionArgs.amount, transactionId,channelID);
 
         // Submit the specified transaction.
-        let response;
         if (functionName == "TransferToken") {
             response = await contract.submitTransaction(functionName, functionArgs.receiverID, functionArgs.amount,"SBI");
 
         } else if (functionName == "ApproveToken") {
-            response = await contract.submitTransaction(functionName, functionArgs.to, functionArgs.amount);
+            response = await contract.submitTransaction(functionName, functionArgs.receiverID, functionArgs.amount);
 
         } else if (functionName == "TransferTokenFrom") {
-            response = await contract.submitTransaction(functionName, functionArgs.senderID, functionArgs.userID, functionArgs.amount, "SBI");
+            response = await contract.submitTransaction(functionName, functionArgs.senderID, functionArgs.userID, functionArgs.amount, "SBI",transactionId);
 
         } else if (functionName == "MintToken") {
-            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.amount, "123abdfyguigiuy",channelID);
+            response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.amount, transactionId,channelID);
 
-        }else if (functionName == "RegisterUser") {
+         }else if (functionName == "RegisterUser") {
             response = await contract.submitTransaction(functionName, functionArgs.userID, functionArgs.bankID);
 
         }
@@ -59,6 +64,7 @@ var invoke = async function (channelID, chaincode, contractName, functionName, f
             response = await contract.submitTransaction(functionName, functionArgs);
         }
 
+        
         console.log('Transaction has been submitted', response.toString());
 
         // Disconnect from the gateway.
