@@ -10,7 +10,7 @@ function TableForm(props) {
     const [state, setState] = useState({
         email: "",
         password: "",
-        tickets_zero: [{  "status": "", "source": "", "OriginTxnID":"" , "balance":""}],
+        tickets_zero: [{   "Source": "", "Origin TxnID":"" , "Last Received":"","Current Balance":""}],
         successMessage: "",
         balance: "",
         tickets: []
@@ -156,30 +156,30 @@ function TableForm(props) {
 
     const renderTableData = () => {
 
-      return ( 
-          <tr key="1" >
-        <td>{"active"}</td>
-        <td>{"hdfc"}</td>
-        <td>{"515f9888dfca1e68bcc48238f620539882e54"}</td>
-        <td>{state.balance}</td>
-        </tr>
-    )
+    //   return ( 
+    //       <tr key="1" >
+    //     <td>{"active"}</td>
+    //     <td>{"hdfc"}</td>
+    //     <td>{"515f9888dfca1e68bcc48238f620539882e54"}</td>
+    //     <td>{state.balance}</td>
+    //     </tr>
+    // )
 
    
 
-        // if (state.tickets && state.tickets.length > 0) {
-        //     return state.tickets.map((ticket, index) => {
-        //         const { userID, source, status,OriginTxnID, token } = ticket //destructuring
-        //         return (
-        //             <tr key={userID}>
-        //                 <td>{status}</td>
-        //                 <td>{source}</td>
-        //                 <td>{OriginTxnID}</td>
-        //                 <td>{token.value}</td>
-        //             </tr>
-        //         )
-        //     })
-        // }
+        if (state.tickets && state.tickets.length > 0) {
+            return state.tickets.map((ticket, index) => {
+                const { userID, source, status,OriginTxnID, token } = ticket //destructuring
+                return (
+                    <tr key={userID}>
+                        <td>{source}</td>
+                        <td>{OriginTxnID}</td>
+                        <td>{token.value}</td>
+                        <td>{state.balance}</td>
+                    </tr>
+                )
+            })
+        }
 
     }
 

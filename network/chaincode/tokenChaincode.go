@@ -271,7 +271,7 @@ func (f *FTContract) TransferToken(ctx contractapi.TransactionContextInterface, 
 
 }
 
-func (f *FTContract) TransferTokenFrom(ctx contractapi.TransactionContextInterface, from string, to string, amount float32, channel string) error {
+func (f *FTContract) TransferTokenFrom(ctx contractapi.TransactionContextInterface, from string, to string, amount float32, channel string, transactionID string) error {
 	if amount < 0 { // transfer of 0 is allowed in ERC-20, so just validate against negative amounts
 		return fmt.Errorf("amount must be a positive integer")
 	}
@@ -400,6 +400,7 @@ func (f *FTContract) TransferTokenFrom(ctx contractapi.TransactionContextInterfa
 	WrapperData.Status = "active"
 	WrapperData.UserID = to
 	WrapperData.Destination = channel
+	WrapperData.OriginTxnID = transactionID
 	WrapperData.Token.Value = int(amount)
 
 	wrapperJSON, err := json.Marshal(WrapperData)

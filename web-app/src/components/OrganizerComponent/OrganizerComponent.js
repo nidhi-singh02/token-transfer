@@ -83,9 +83,9 @@ function OrganizerComponent(props) {
 
     const CallApproveTicket = () => {
         props.showError(null);
-        const payload = { "from": props.emailID, "to": "secondary@wbp.org", "ticketID": state.ticketID }
+        const payload = { "from": props.emailID, "receiverID": state.spenderID, "amount": state.amount }
 
-        axios.post(API_BASE_URL + '/approveticket/', payload)
+        axios.post(API_BASE_URL + '/approvetoken/', payload)
             .then(function (response) {
                 console.log("response for approve ticket", response)
                 if (response.status === 200) {
@@ -127,7 +127,7 @@ function OrganizerComponent(props) {
                 if (response.status === 200) {
                     setState(prevState => ({
                         ...prevState,
-                        'successMessage': 'Minted ticket.',
+                        'successMessage': 'Minted tokens.',
                         tickets: [...prevState.tickets, response.data]
                     }))
                     props.showError(null)
@@ -265,14 +265,26 @@ function OrganizerComponent(props) {
                             onChange={handleChange} />
                     </div>
                 </form>
-
-
-                <button type="submit" class="btn btn-primary" onClick={handleSubmitClickToken} >
-                    Approve Token
-             </button>
                 <button type="submit" class="btn btn-primary" onClick={handleSubmitMint} >
                     Mint Token
              </button>
+
+             <form>
+                    <div class="form-group-token">
+                        <label for="amount">Enter value:</label>
+                        <input type="text" class="form-control" id="amount" value={state.amount}
+                            onChange={handleChange} />
+                    </div>
+                    <div class="form-group-token">
+                        <label for="spenderID">Enter spender ID:</label>
+                        <input type="text" class="form-control" id="spenderID" value={state.spenderID}
+                            onChange={handleChange} />
+                    </div>
+                </form>
+                <button type="submit" class="btn btn-primary" onClick={handleSubmitClickToken} >
+                    Approve Token
+             </button>
+          
 
             </div >
 
