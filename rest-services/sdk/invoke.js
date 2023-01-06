@@ -35,7 +35,7 @@ var invoke = async function (channelID, chaincode, contractName, functionName, f
         const contract = network.getContract(chaincode, contractName);
 
       //  const transactionID = contract.createTransaction().getTransactionId();
-     
+    
 
         // Submit the specified transaction.
         let response;

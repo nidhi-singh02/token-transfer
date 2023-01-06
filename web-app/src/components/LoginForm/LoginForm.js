@@ -23,9 +23,10 @@ function LoginForm(props) {
         const payload = {
             "emailID": state.email,
             "password": state.password,
+            "bankID": "hdfcbank404"
         }
 
-        if (payload.emailID === "wbp@wbp.org") {
+        if (payload.emailID === "admin@hdfcbank") {
 
             redirectToOrganizerPage();
             props.showError(null)

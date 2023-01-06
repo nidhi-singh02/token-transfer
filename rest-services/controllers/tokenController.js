@@ -100,14 +100,14 @@ var transferTokenFrom = async function (req, res, next) {
         var { senderID, receiverID, amount } = req.body
         console.log("senderID receiverID :", senderID,receiverID)
 
-        let response = await invoke(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ftContract, "TransferToken", { senderID: senderID,userID: receiverID, amount: amount });
+        let response = await invoke(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ftContract, "TransferTokenFrom", { senderID: senderID,userID: receiverID, amount: amount });
 
         let resp = JSON.stringify(response)
         if (resp.includes("Error")) {
             return res.status(500).json(response.responses[0].response.message)
         }
       
-         response_query = await query(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ftContract, "QueryTokens", '{"selector":{"UserID":"' + receiverID + '"}}');
+         response_query = await query(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ftContract, "QueryTokens", '{"selector":{"userID":"' + receiverID + '", "userName": { "$exists": false}}}');
         if (response_query.hasOwnProperty("Error")) {
             return res.status(500).send(response_query)
         }
@@ -143,11 +143,34 @@ var approveToken = async function (req, res, next) {
     }
 }
 
+var tokenByOwner = async function (req, res, next) {
+    try {
+
+        let UserID = req.params.userID
+
+        if (UserID == "" || UserID == 'null') {
+            return res.status(501).send("User ID cannot be null")
+        }
+        let response = await query(config.FabricConfig.channelID, config.FabricConfig.chaincodeID, config.FabricConfig.ftContract, "QueryTokens", '{"selector":{"userID":"' + UserID + '"}}');
+        if (response.hasOwnProperty("Error")) {
+            return res.status(500).send(response)
+
+        }
+        res.status(200).send(response)
+
+    } catch (error) {
+        console.log("Error while tokenByOwner:", error)
+        res.status(500).send({ "Error": error })
+
+    }
+}
+
 
 module.exports = {
     getBalance: getBalance,
     mintToken: mintToken,
     transferToken: transferToken,
     transferTokenFrom: transferTokenFrom,
-    approveToken: approveToken
+    approveToken: approveToken,
+    tokenByOwner: tokenByOwner
 }

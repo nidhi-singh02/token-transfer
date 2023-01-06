@@ -1,27 +1,6 @@
 package main
 
-// Scenarios to represent
-//1 bank(SBI) - 1st user -> 2nd user ->
-//2 banks
-//(SBI bank) -> 1 user ----- 1 user - HDFC bank
 
-// one bank can have different channels
-// Inter-channel communication
-// tests on caliper for multiple channels
-// tests on caliper for one channel
-
-// Novelty
-// Wrapper
-// channels on different orderers
-// comparsion results
-// Generic stack
-
-// why multi-RAFT not good solution
-
-// sharing the config file shared across, doesn't matter ? - Data sharding logic
-// Consortium management operation - new org added, edit the file
-
-// Bank describes basic details of Bank
 type Bank struct {
 	BankID       string   `json:"ID"`
 	Name         string   `json:"name"`

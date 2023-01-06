@@ -7,5 +7,6 @@ route.post('/minttoken', tokenCtrl.mintToken)
 route.post('/transfertoken', tokenCtrl.transferToken)
 route.post('/transfertokenfrom', tokenCtrl.transferTokenFrom)
 route.post('/approvetoken', tokenCtrl.approveToken)
+route.get('/tokenByOwner/:userID', tokenCtrl.tokenByOwner)
 
 module.exports = route

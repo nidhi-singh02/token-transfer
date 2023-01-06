@@ -211,12 +211,12 @@ func (f *FTContract) TransferToken(ctx contractapi.TransactionContextInterface, 
 		return err
 	}
 
-	err = ctx.GetStub().PutState(AdminID, userJSON)
+	err = ctx.GetStub().PutState("u"+AdminID, userJSON)
 	if err != nil {
 		return fmt.Errorf("failed to put to world state for admin user %v", err)
 	}
 
-	err = ctx.GetStub().PutState(to, touserJSON)
+	err = ctx.GetStub().PutState("u"+to, touserJSON)
 	if err != nil {
 		return fmt.Errorf("failed to put to world state for to user %v", err)
 	}
@@ -286,6 +286,8 @@ func (f *FTContract) TransferTokenFrom(ctx contractapi.TransactionContextInterfa
 		return fmt.Errorf("from account %s is invalid. It does not exists", from)
 
 	}
+
+	log.Printf("fromBytes %v",string(fromBytes))
 	toBytes, err := ctx.GetStub().GetState("u"+to)
 	if err != nil {
 		return fmt.Errorf("failed to read recipient account %s from world state: %v", to, err)
@@ -296,6 +298,9 @@ func (f *FTContract) TransferTokenFrom(ctx contractapi.TransactionContextInterfa
 		return fmt.Errorf("to account %s is invalid. It does not exists", to)
 
 	}
+
+	log.Printf("toBytes %v",string(toBytes))
+
 	var FromUserData User
 
 	if fromBytes != nil {
@@ -315,11 +320,16 @@ func (f *FTContract) TransferTokenFrom(ctx contractapi.TransactionContextInterfa
 
 	updatedBalance := currentBalance - amountFloat
 
+	log.Printf("updatedBalance %v",updatedBalance)
+
 	FromUserData.Balance = updatedBalance
 	userJSON, err := json.Marshal(FromUserData)
 	if err != nil {
 		return err
 	}
+
+
+	log.Printf("FromUserData %v",FromUserData)
 
 	var ToUserData User
 
@@ -330,6 +340,8 @@ func (f *FTContract) TransferTokenFrom(ctx contractapi.TransactionContextInterfa
 	toCurrentBalance := ToUserData.Balance
 	toUpdatedBalance := toCurrentBalance + amountFloat
 	ToUserData.Balance = toUpdatedBalance
+
+	log.Printf("ToUserData %v",ToUserData)
 
 	// get token
 	TokenBytes, err := ctx.GetStub().GetState("u"+from)
@@ -349,18 +361,26 @@ func (f *FTContract) TransferTokenFrom(ctx contractapi.TransactionContextInterfa
 		return err
 	}
 
-	err = ctx.GetStub().PutState(from, userJSON)
+	log.Printf("userJSON %v",string(userJSON))
+
+	err = ctx.GetStub().PutState("u"+from, userJSON)
 	if err != nil {
 		return fmt.Errorf("failed to put to world state for from user %v", err)
 	}
 
-	err = ctx.GetStub().PutState(to, touserJSON)
+	log.Printf("touserJSON %v",string(touserJSON))
+
+	err = ctx.GetStub().PutState("u"+to, touserJSON)
 	if err != nil {
 		return fmt.Errorf("failed to put to world state for to user %v", err)
 	}
 
+
 	// Wrapper
-	AdminBytes, err := ctx.GetStub().GetState(AdminID)
+	AdminBytes, err := ctx.GetStub().GetState(from)
+
+	log.Printf("AdminBytes %v",string(AdminBytes))
+
 	if err != nil {
 		return fmt.Errorf("failed to read recipient account %s from world state: %v", to, err)
 	}
@@ -377,15 +397,16 @@ func (f *FTContract) TransferTokenFrom(ctx contractapi.TransactionContextInterfa
 		err = json.Unmarshal(AdminBytes, &WrapperData)
 	}
 
-	WrapperData.Status = "inactive"
+	WrapperData.Status = "active"
 	WrapperData.UserID = to
 	WrapperData.Destination = channel
+	WrapperData.Token.Value = int(amount)
 
 	wrapperJSON, err := json.Marshal(WrapperData)
 	if err != nil {
 		return err
 	}
-
+	log.Printf("wrapperJSON %v",string(wrapperJSON))	
 	err = ctx.GetStub().PutState(to, wrapperJSON)
 	if err != nil {
 		return fmt.Errorf("failed to put to world state for to user %v", err)

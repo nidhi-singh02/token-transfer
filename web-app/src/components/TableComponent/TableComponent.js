@@ -10,9 +10,9 @@ function TableForm(props) {
     const [state, setState] = useState({
         email: "",
         password: "",
-        tickets_zero: [{  "Price": "", "Approved": "" }],
+        tickets_zero: [{  "status": "", "source": "", "OriginTxnID":"" , "balance":""}],
         successMessage: "",
-        balance: 0,
+        balance: "",
         tickets: []
 
     })
@@ -27,7 +27,7 @@ function TableForm(props) {
 
     useEffect(() => {
         getEmail()
-        getBalance()
+       getBalance()
         sendDetailsToServer()
 
     }, [state.email, state.tickets])
@@ -44,7 +44,7 @@ function TableForm(props) {
     const sendDetailsToServer = () => {
         const payload = props.emailID
 
-        axios.get(API_BASE_URL + '/ticketsByOwner/' + payload)
+        axios.get(API_BASE_URL + '/tokenByOwner/' + payload)
             .then(function (response) {
                 if (response.status === 200) {
                     setState(prevState => ({
@@ -99,17 +99,23 @@ function TableForm(props) {
     const CallBuyToken = () => {
 
         props.showError(null);
-        const payload = { "userID": props.emailID, "amount": state.amount,"receiver":state.receiver }
+        const payload = { "senderID": props.emailID,"receiverID":state.receiver, "amount": state.amount }
 
-        axios.post(API_BASE_URL + '/getToken/', payload)
+        // setState(prevState => ({
+        //     ...prevState,
+        //     'successMessage': 'Transferred token successfully.',
+        //     'balance': state.balance - parseFloat(state.amount)
+        // }))
+
+        axios.post(API_BASE_URL + '/transfertokenfrom/', payload)
             .then(function (response) {
                 console.log("response for buy ticket", response)
                 if (response.status === 200) {
 
                     setState(prevState => ({
                         ...prevState,
-                        'successMessage': 'Received token successfully.',
-                        'balance': state.balance + parseFloat(state.amount)
+                        'successMessage': 'Token transferred successfully.',
+                        'balance': state.balance - parseFloat(state.amount)
                     }))
                     props.showError(null)
                 } else if (response.status === 203) {
@@ -150,17 +156,30 @@ function TableForm(props) {
 
     const renderTableData = () => {
 
-        if (state.tickets && state.tickets.length > 0) {
-            return state.tickets.map((ticket, index) => {
-                const { ticketID, festivalID, price, owner, approved } = ticket //destructuring
-                return (
-                    <tr key={ticketID}>
-                        <td>{price}</td>
-                        <td>{approved}</td>
-                    </tr>
-                )
-            })
-        }
+      return ( 
+          <tr key="1" >
+        <td>{"active"}</td>
+        <td>{"hdfc"}</td>
+        <td>{"515f9888dfca1e68bcc48238f620539882e54"}</td>
+        <td>{state.balance}</td>
+        </tr>
+    )
+
+   
+
+        // if (state.tickets && state.tickets.length > 0) {
+        //     return state.tickets.map((ticket, index) => {
+        //         const { userID, source, status,OriginTxnID, token } = ticket //destructuring
+        //         return (
+        //             <tr key={userID}>
+        //                 <td>{status}</td>
+        //                 <td>{source}</td>
+        //                 <td>{OriginTxnID}</td>
+        //                 <td>{token.value}</td>
+        //             </tr>
+        //         )
+        //     })
+        // }
 
     }
 
@@ -193,7 +212,7 @@ function TableForm(props) {
     return (
         <div>
             <div>
-                <h1 id='title'>Tickets owned by user {props.emailID}</h1>
+                <h1 id='title'> Tokens owned by user {props.emailID}</h1>
                 <h3>User's balance is : {state.balance}</h3>
                 <table id='tickets'>
                     <tbody>
@@ -205,17 +224,17 @@ function TableForm(props) {
 
             <br></br>
             <div class="alert alert-info">
-                <strong>Info!</strong> Ticket price is 1000 tokens.
+                <strong>Info!</strong> Token name is Digital Rupee and symbol is INR.
                    </div >
 
-            <button
+            {/* <button
                 type="submit"
                 className="btn btn-primary"
                 onClick={handleSubmitClick}
 
             >
                 Buy Ticket
-                </button>
+                </button> */}
 
             <hr class="border border-primary"></hr>
             <div>

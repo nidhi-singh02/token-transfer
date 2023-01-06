@@ -24,6 +24,7 @@ function RegistrationForm(props) {
             const payload = {
                 "emailID": state.email,
                 "password": state.password,
+                "bankID": "hdfcbank404"
             }
             axios.post(API_BASE_URL + '/user', payload)
                 .then(function (response) {

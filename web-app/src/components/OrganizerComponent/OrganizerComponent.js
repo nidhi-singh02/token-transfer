@@ -28,7 +28,7 @@ function OrganizerComponent(props) {
     useEffect(() => {
         getEmail()
         getBalance()
-        getTotalTickets()
+       // getTotalTickets()
 
     }, [state.email, state.tickets, state.soldTickets, state.balance, state.tickets.approved])
     //added tickets
@@ -118,12 +118,12 @@ function OrganizerComponent(props) {
     const MintTicket = () => {
         props.showError(null);
 
-        const payload = { "userID": props.emailID, "festivalID": "fest404", "ticketID": state.ticketID }
+        const payload = { "userID": props.emailID, "amount": state.ticketID }
 
         console.log("payload", payload)
-        axios.post(API_BASE_URL + '/mintticket/', payload)
+        axios.post(API_BASE_URL + '/minttoken/', payload)
             .then(function (response) {
-                console.log("response for mint ticket", response)
+                console.log("response for minttoken", response)
                 if (response.status === 200) {
                     setState(prevState => ({
                         ...prevState,
@@ -233,18 +233,18 @@ function OrganizerComponent(props) {
     return (
         <div>
             <div>
-                <h3>Organizer balance is : {state.balance}</h3>
-                <h1 id='title'>Tickets remaining</h1>
+                <h3>Admin balance is : {state.balance}</h3>
+                {/* <h1 id='title'>Tickets remaining</h1>
                 <table id='tickets'>
                     <tbody>
                         <tr>{renderTableHeader()}</tr>
                         {renderTableData()}
                     </tbody>
-                </table>
+                </table> */}
 
             </div>
             <br></br>
-
+{/* 
             <div>
                 <h1 id='title'>Tickets sold</h1>
                 <table id='tickets'>
@@ -254,13 +254,13 @@ function OrganizerComponent(props) {
                     </tbody>
                 </table>
 
-            </div>
+            </div> */}
 
             <br></br>
             <div>
                 <form>
                     <div class="form-group-token">
-                        <label for="ticketID">Enter ticket ID:</label>
+                        <label for="ticketID">Enter amount:</label>
                         <input type="text" class="form-control" id="ticketID" value={state.ticketID}
                             onChange={handleChange} />
                     </div>
@@ -268,10 +268,10 @@ function OrganizerComponent(props) {
 
 
                 <button type="submit" class="btn btn-primary" onClick={handleSubmitClickToken} >
-                    Approve Ticket
+                    Approve Token
              </button>
                 <button type="submit" class="btn btn-primary" onClick={handleSubmitMint} >
-                    Mint Ticket
+                    Mint Token
              </button>
 
             </div >
