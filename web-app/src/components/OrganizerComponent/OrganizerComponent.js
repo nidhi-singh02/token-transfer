@@ -90,12 +90,9 @@ function OrganizerComponent(props) {
                 console.log("response for approve ticket", response)
                 if (response.status === 200) {
 
-                    let TobeUpdated = search(state.ticketID, state.tickets)
-
                     setState(prevState => ({
                         ...prevState,
-                        'successMessage': 'Approved ticket successfully.',
-                        tickets: [...prevState.tickets, TobeUpdated]
+                        'successMessage': 'Approved tokens successfully.',
                     }))
                     props.showError(null)
                 } else if (response.status === 203) {
